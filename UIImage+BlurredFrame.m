@@ -25,16 +25,18 @@
 - (UIImage *) addImageToImage:(UIImage *)img atRect:(CGRect)cropRect{
     
     CGSize size = CGSizeMake(self.size.width, self.size.height);
-    UIGraphicsBeginImageContextWithOptions(size, NO, self.scale);
     
-    CGPoint pointImg1 = CGPointMake(0,0);
-    [self drawAtPoint:pointImg1];
-    
-    CGPoint pointImg2 = cropRect.origin;
-    [img drawAtPoint: pointImg2];
-    
-    UIImage* result = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    UIGraphicsImageRendererFormat *format = [[UIGraphicsImageRendererFormat alloc] init];
+    format.scale = self.scale;
+    format.opaque = NO;
+    UIGraphicsImageRenderer *render = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
+    UIImage *result = [render imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        CGPoint pointImg1 = CGPointMake(0,0);
+        [self drawAtPoint:pointImg1];
+        
+        CGPoint pointImg2 = cropRect.origin;
+        [img drawAtPoint: pointImg2];
+    }];
     
     return result;
 }
